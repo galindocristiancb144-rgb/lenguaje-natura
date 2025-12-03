@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Visión Artificial con Python</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 2rem;
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+        }
+
+        .hero h1 {
+            font-size: clamp(2.5rem, 8vw, 5rem);
+            margin-bottom: 1rem;
+            color: #2c3e50;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .hero p {
+            font-size: clamp(1.2rem, 3vw, 1.8rem);
+            color: #555;
+            margin-top: 1rem;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 3rem 2rem;
+        }
+
+        .catalog {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 2rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.2);
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, #ff9a9e 0%, #fad0c4 100%);
+        }
+
+        .card:nth-child(2)::before {
+            background: linear-gradient(90deg, #a18cd1 0%, #fbc2eb 100%);
+        }
+
+        .card:nth-child(3)::before {
+            background: linear-gradient(90deg, #ffecd2 0%, #fcb69f 100%);
+        }
+
+        .card:nth-child(4)::before {
+            background: linear-gradient(90deg, #ff9a9e 0%, #fecfef 100%);
+        }
+
+        .card:nth-child(5)::before {
+            background: linear-gradient(90deg, #a8edea 0%, #fed6e3 100%);
+        }
+
+        .card:nth-child(6)::before {
+            background: linear-gradient(90deg, #ffecd2 0%, #fcb69f 100%);
+        }
+
+        .card:nth-child(7)::before {
+            background: linear-gradient(90deg, #a1c4fd 0%, #c2e9fb 100%);
+        }
+
+        .card:nth-child(8)::before {
+            background: linear-gradient(90deg, #fbc2eb 0%, #a6c1ee 100%);
+        }
+
+        .card:nth-child(9)::before {
+            background: linear-gradient(90deg, #fdcbf1 0%, #e6dee9 100%);
+        }
+
+        .card:nth-child(10)::before {
+            background: linear-gradient(90deg, #ffecd2 0%, #fcb69f 100%);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .card h3 {
+            font-size: 1.5rem;
+            color: #2c3e50;
+        }
+
+        .card-description {
+            color: #666;
+            margin-bottom: 1.5rem;
+            font-size: 0.95rem;
+        }
+
+        .glossary {
+            background: #f8f9fa;
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+        }
+
+        .glossary-title {
+            font-weight: bold;
+            color: #495057;
+            margin-bottom: 0.5rem;
+        }
+
+        .glossary ul {
+            list-style: none;
+            padding-left: 1rem;
+        }
+
+        .glossary li {
+            margin-bottom: 0.3rem;
+            color: #6c757d;
+        }
+
+        .btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+
+        .btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .code-container {
+            display: none;
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin-top: 1rem;
+            overflow-x: auto;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .code-container.active {
+            display: block;
+        }
+
+        pre {
+            margin: 0;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+
+        code {
+            font-family: 'Courier New', monospace;
+            font-size: 0.85rem;
+            line-height: 1.5;
+        }
+
+        @media (max-width: 768px) {
+            .catalog {
+                grid-template-columns: 1fr;
+            }
+            
+            .hero h1 {
+                font-size: 2.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="hero">
+        <h1>Visión Artificial con Python</h1>
+        <p>Realizado por: <strong>Crys</strong></p>
+    </div>
+
+    <div class="container">
+        <div class="catalog">
+            <!-- Card 1: Abrir Imagen -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon">🖼️</div>
+                    <h3>1. Abrir Imagen</h3>
+                </div>
+                <p class="card-description">Cargar y mostrar una imagen utilizando OpenCV.</p>
+                <div class="glossary">
+                    <div class="glossary-title">Glosario:</div>
+                    <ul>
+                        <li><strong>cv2.imread():</strong> Carga una imagen desde un archivo</li>
+                        <li><strong>cv2.imshow():</strong> Muestra la imagen en una ventana</li>
+                        <li><strong>cv2.waitKey():</strong> Espera la presión de una tecla</li>
+                        <li><strong>cv2.destroyAllWindows():</strong> Cierra todas las ventanas</li>
+                    </ul>
+                </div>
+                <button class="btn" onclick="toggleCode(1)">Ver Código</button>
+                <div class="code-container" id="code-1">
+                    <pre><code>import cv2
+
+# Cargar una imagen
+img = cv2.imread('gato.jpg')
+
+# Mostrar la imagen en una ventana
+cv2.imshow('Mi Imagen', img)
+
+# Esperar hasta que el usuario presione una tecla
+cv2.waitKey(0)
+cv2.destroyAllWindows()</code></pre>
+                </div>
+            </div>
+
+            <!-- Card 2: Escala de Grises -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon">⚫</div>
+                    <h3>2. Escala de Grises</h3>
+                </div>
+                <p class="card-description">Convertir una imagen a color en escala de grises.</p>
+                <div class="glossary">
+                    <div class="glossary-title">Glosario:</div>
+                    <ul>
+                        <li><strong>BGR:</strong> Formato de color (Azul, Verde, Rojo)</li>
+                        <li><strong>cv2.cvtColor():</strong> Convierte entre espacios de color</li>
+                        <li><strong>COLOR_BGR2GRAY:</strong> Convierte de BGR a escala de grises</li>
+                        <li><strong>NumPy Array:</strong> Matriz que representa la imagen</li>
+                    </ul>
+                </div>
+                <button class="btn" onclick="toggleCode(2)">Ver Código</button>
+                <div class="code-container" id="code-2">
+                    <pre><code>import cv2
+
+img = cv2.imread('equipo.jpg')
+# Devuelve una matriz NumPy en formato BGR (Azul, Verde, Rojo)
+
+gris = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+# Convierte la imagen de color (BGR) a escala de grises
+
+cv2.imshow('Original', img)
+# Muestra una ventana con la imagen a color
+
+cv2.imshow('Escala de Grises', gris)
+# Muestra otra ventana con la imagen en escala de grises
+
+cv2.waitKey(0)
+# El parámetro 0 significa "esperar indefinidamente"
+# Si pusieras 1000, esperaría 1 segundo antes de cerrar
+
+cv2.destroyAllWindows()</code></pre>
+                </div>
+            </div>
+
+            <!-- Card 3: Información de Imagen -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon">📊</div>
+                    <h3>3. Información de Imagen</h3>
+                </div>
+                <p class="card-description">Obtener dimensiones y propiedades de una imagen.</p>
+                <div class="glossary">
+                    <div class="glossary-title">Glosario:</div>
+                    <ul>
+                        <li><strong>.shape:</strong> Propiedad que devuelve dimensiones</li>
+                        <li><strong>.shape[0]:</strong> Alto de la imagen (filas)</li>
+                        <li><strong>.shape[1]:</strong> Ancho de la imagen (columnas)</li>
+                        <li><strong>.shape[2]:</strong> Canales de color (3 para BGR)</li>
+                    </ul>
+                </div>
+                <button class="btn" onclick="toggleCode(3)">Ver Código</button>
+                <div class="code-container" id="code-3">
+                    <pre><code>import cv2
+
+img = cv2.imread('gato.jpg')
+
+print("Dimensiones:", img.shape)
+# Formato: (alto, ancho, canales)
+
+print("Alto:", img.shape[0])
+# Representa el alto (número de filas) o cantidad de píxeles verticales
+
+print("Ancho:", img.shape[1])
+# Indica el ancho (número de columnas) o cantidad de píxeles horizontales
+
+print("Canales de color:", img.shape[2])</code></pre>
+                </div>
+            </div>
+
+            <!-- Card 4: Ajustar Tamaño -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon">🔍</div>
+                    <h3>4. Ajustar Tamaño</h3>
+                </div>
+                <p class="card-description">Redimensionar imágenes con tamaño fijo o escala proporcional.</p>
+                <div class="glossary">
+                    <div class="glossary-title">Glosario:</div>
+                    <ul>
+                        <li><strong>cv2.resize():</strong> Cambia el tamaño de la imagen</li>
+                        <li><strong>fx, fy:</strong> Factores de escala para ancho y alto</li>
+                        <li><strong>interpolation:</strong> Método de interpolación (INTER_AREA)</li>
+                        <li><strong>None:</strong> No especifica dimensiones exactas</li>
+                    </ul>
+                </div>
+                <button class="btn" onclick="toggleCode(4)">Ver Código</button>
+                <div class="code-container" id="code-4">
+                    <pre><code>import cv2
+
+# Cargar la imagen
+img = cv2.imread('equipo.jpg')
+
+# Redimensionar la imagen a un tamaño fijo
+img_pequena = cv2.resize(img, (300, 200))
+
+# También puedes escalar proporcionalmente
+img_grande = cv2.resize(img_pequena, None, fx=2, fy=2, 
+                        interpolation=cv2.INTER_AREA)
+"""
+cv2.resize(): cambia el tamaño de la imagen
+img: imagen original
+None: no se especifican dimensiones exactas
+fx=1.5: multiplica el ancho por 1.5 (50% más ancho)
+fy=1.5: multiplica el alto por 1.5 (50% más alto)
+Resultado: img_grande es 1.5 veces más grande
+"""
+
+# Mostrar las tres imágenes
+cv2.imshow('Original', img)
+cv2.imshow('Más pequeña', img_pequena)
+cv2.imshow('Más grande', img_grande)
+
+cv2.waitKey(0)
+cv2.destroyAllWindows()</code></pre>
+                </div>
+            </div>
+
+            <!-- Card 5: Recorte -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon">✂️</div>
+                    <h3>5. Recorte</h3>
+                </div>
+                <p class="card-description">Recortar una región específica de una imagen.</p>
+                <div class="glossary">
+                    <div class="glossary-title">Glosario:</div>
+                    <ul>
+                        <li><strong>Slicing:</strong> [inicio:fin] para seleccionar región</li>
+                        <li><strong>[y1:y2, x1:x2]:</strong> Coordenadas del recorte</li>
+                        <li><strong>ord():</strong> Convierte carácter a código ASCII</li>
+                        <li><strong>break:</strong> Sale del bucle while</li>
+                    </ul>
+                </div>
+                <button class="btn" onclick="toggleCode(5)">Ver Código</button>
+                <div class="code-container" id="code-5">
+                    <pre><code>import cv2  # Importa librería OpenCV
+
+# Cargar imagen
+gato = cv2.imread('gato.jpg')
+
+while True:
+    recorte = gato[20:600, 50:600]  # Alto y ancho
+    cv2.imshow('imagen original', gato)
+    cv2.imshow('imagen recortada', recorte)
+    
+    tecla = cv2.waitKey(0)
+    if tecla == ord('x'):
+        cv2.destroyAllWindows()
+        break</code></pre>
+                </div>
+            </div>
+
+            <!-- Card 6: Movimiento -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon">🔄</div>
+                    <h3>6. Rotación</h3>
+                </div>
+                <p class="card-description">Rotar imágenes con teclas de control.</p>
+                <div class="glossary">
+                    <div class="glossary-title">Glosario:</div>
+                    <ul>
+                        <li><strong>cv2.rotate():</strong> Rota la imagen</li>
+                        <li><strong>ROTATE_90_CLOCKWISE:</strong> Gira 90° a la derecha</li>
+                        <li><strong>ROTATE_90_COUNTERCLOCKWISE:</strong> Gira 90° a la izquierda</li>
+                        <li><strong>ROTATE_180:</strong> Gira 180°</li>
+                        <li><strong>.copy():</strong> Crea una copia de la imagen</li>
+                    </ul>
+                </div>
+                <button class="btn" onclick="toggleCode(6)">Ver Código</button>
+                <div class="code-container" id="code-6">
+                    <pre><code>import cv2
+
+# Guardamos la imagen en una variable
+imagen = cv2.imread('Spider.jpg')
+
+# Creo una copia de la imagen
+imgoriginal = imagen.copy()
+
+while True:
+    cv2.imshow('Spider', imagen)
+    tecla = cv2.waitKey(0)  # Espera infinita hasta presionar una tecla
+    
+    if tecla == ord('d'):  # D gira a la derecha
+        imagen = cv2.rotate(imagen, cv2.ROTATE_90_CLOCKWISE)
+        print("se presiono la tecla", tecla)
+    
+    if tecla == ord('a'):
+        imagen = cv2.rotate(imagen, cv2.ROTATE_90_COUNTERCLOCKWISE)
+        print("se presiono la tecla", tecla)
+    
+    if tecla == ord('w'):
+        imagen = cv2.rotate(imagen, cv2.ROTATE_180)
+        print("se presiono la tecla", tecla)
+    
+    elif tecla == ord('s'):
+        print("se presiono la tecla", tecla)
+        break
+    
+    cv2.imshow('Spider', imagen)
+    cv2.waitKey(0)</code></pre>
+                </div>
+            </div>
+
+            <!-- Card 7: Zoom -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon">🔎</div>
+                    <h3>7. Zoom Interactivo</h3>
+                </div>
+                <p class="card-description">Aplicar zoom con teclas + y - en la imagen.</p>
+                <div class="glossary">
+                    <div class="glossary-title">Glosario:</div>
+                    <ul>
+                        <li><strong>zoom:</strong> Variable que controla el factor de escala</li>
+                        <li><strong>fx, fy:</strong> Factores de escala horizontal y vertical</li>
+                        <li><strong>+ tecla:</strong> Aumenta el zoom 1.2x</li>
+                        <li><strong>- tecla:</strong> Reduce el zoom 0.5x</li>
+                        <li><strong>o tecla:</strong> Restaura el zoom original</li>
+                    </ul>
+                </div>
+                <button class="btn" onclick="toggleCode(7)">Ver Código</button>
+                <div class="code-container" id="code-7">
+                    <pre><code>def zoom():
+    import cv2
+    
+    # Carga la imagen
+    img_ori = cv2.imread("Spider.jpg")
+    
+    # Variable para el valor del zoom original
+    zoom = 1.0
+    
+    while True:
+        img = cv2.resize(img_ori, None, fx=zoom, fy=zoom)
+        cv2.imshow("imagen nueva", img)
+        tecla = cv2.waitKey(0)
+        
+        if tecla == ord('+'):
+            zoom = zoom * 1.2
+        elif tecla == ord('-'):
+            zoom = zoom * 0.5
+        elif tecla == ord('o'):
+            zoom = 1.0
+        elif tecla == ord('x'):
+            break
+    
+    cv2.destroyAllWindows()
+
+if __name__ == "__main__":
+    zoom()</code></pre>
+                </div>
+            </div>
+
+            <!-- Card 8: Procedimientos -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon">⚙️</div>
+                    <h3>8. Menú de Procedimientos</h3>
+                </div>
+                <p class="card-description">Sistema de menú para ejecutar diferentes operaciones.</p>
+                <div class="glossary">
+                    <div class="glossary-title">Glosario:</div>
+                    <ul>
+                        <li><strong>import:</strong> Importa funciones de otros archivos</li>
+                        <li><strong>while True:</strong> Bucle infinito para el menú</li>
+                        <li><strong>input():</strong> Captura entrada del usuario</li>
+                        <li><strong>int():</strong> Convierte texto a número entero</li>
+                    </ul>
+                </div>
+                <button class="btn" onclick="toggleCode(8)">Ver Código</button>
+                <div class="code-container" id="code-8">
+                    <pre><code>import cv2
+from cordenadas import recortes
+from MOVIMIENTO import movimiento
+from ZOOM_IMG import zoom
+
+while True:
+    opcion = int(input("""PROCESAMIENTO DE IMAGENES
+    1. recortar
+    2. girar
+    3. zoom
+    4. salir
+    seleccionar una opcion: """))
+    
+    if opcion == 1:
+        print("ejecuta el archivo cordenadas")
+        recortes()
+    elif opcion == 2:
+        print("ejecuta el archivo movimiento")
+        movimiento()
+    elif opcion == 3:
+        print("ejecuta el archivo zoom")
+        zoom()
+    elif opcion == 4:
+        print("ejecuta el salir")
+        break</code></pre>
+                </div>
+            </div>
+
+            <!-- Card 9: OCR Básico -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon">📝</div>
+                    <h3>9. OCR Básico</h3>
+                </div>
+                <p class="card-description">Sistema de menú de procesamiento (igual al anterior).</p>
+                <div class="glossary">
+                    <div class="glossary-title">Glosario:</div>
+                    <ul>
+                        <li><strong>OCR:</strong> Optical Character Recognition</li>
+                        <li><strong>Menú interactivo:</strong> Permite seleccionar operaciones</li>
+                        <li><strong>Modular:</strong> Código organizado en funciones</li>
+                    </ul>
+                </div>
+                <button class="btn" onclick="toggleCode(9)">Ver Código</button>
+                <div class="code-container" id="code-9">
+                    <pre><code>import cv2
+from cordenadas import recortes
+from MOVIMIENTO import movimiento
+from ZOOM_IMG import zoom
+
+while True:
+    opcion = int(input("""PROCESAMIENTO DE IMAGENES
+    1. recortar
+    2. girar
+    3. zoom
+    4. salir
+    seleccionar una opcion: """))
+    
+    if opcion == 1:
+        print("ejecuta el archivo cordenadas")
+        recortes()
+    elif opcion == 2:
+        print("ejecuta el archivo movimiento")
+        movimiento()
+    elif opcion == 3:
+        print("ejecuta el archivo zoom")
+        zoom()
+    elif opcion == 4:
+        print("ejecuta el salir")
+        break</code></pre>
+                </div>
+            </div>
+
+            <!-- Card 10: OCR Placas -->
+            <div class="card">
+                <div class="card-header">
+                    <div class="card-icon">🚗</div>
+                    <h3>10. OCR para Placas</h3>
+                </div>
+                <p class="card-description">Reconocimiento de placas vehiculares con Tesseract.</p>
+                <div class="glossary">
+                    <div class="glossary-title">Glosario:</div>
+                    <ul>
+                        <li><strong>pytesseract:</strong> Librería de OCR</li>
+                        <li><strong>tesseract_cmd:</strong> Ruta del ejecutable Tesseract</li>
+                        <li><strong>image_to_string():</strong> Extrae texto de imagen</li>
+                        <li><strong>--psm 6:</strong> Modo de segmentación de página</li>
+                        <li><strong>.strip():</strong> Elimina espacios en blanco</li>
+                        <li><strong>.upper():</strong> Convierte a mayúsculas</li>
+                    </ul>
+                </div>
+                <button class="btn" onclick="toggleCode(10)">Ver Código</button>
+                <div class="code-container" id="code-10">
+                    <pre><code>import cv2
+import pytesseract
+
+# Configuración de pytesseract
+pytesseract.pytesseract.tesseract_cmd = r'C:\Program Files\Tesseract-OCR\tesseract.exe'
+
+def leer_placas(imagenes, lista_placas_permitidas):
+    placas_leidas = []
+    placas_no_leidas = []
+    
+    for imagen_path in imagenes:
+        # 1. Cargar la imagen
+        img = cv2.imread(imagen_path)
+        if img is None:
+            print(f"Error: No se pudo cargar la imagen {imagen_path}")
+            continue
+        
+        # 2. Extraer el texto de la placa
+        try:
+            texto_placa = pytesseract.image_to_string(img, config='--psm 6')
+            texto_placa = texto_placa.strip().upper()
+            print(f"Texto OCR detectado: {texto_placa}")
+        except Exception as e:
+            print(f"Error al extraer texto: {e}")
+            placas_no_leidas.append(imagen_path)
+            continue
+        
+        # 3. Verificar si está en la lista permitida
+        if texto_placa in lista_placas_permitidas:
+            placas_leidas.append(texto_placa)
+        else:
+            placas_no_leidas.append(texto_placa)
+    
+    # 4. Mostrar resultados
+    if placas_leidas:
+        print("Placas leídas:")
+        for placa in placas_leidas:
+            print(placa)
+    else:
+        print("No se encontraron placas leídas.")
+    
+    if placas_no_leidas:
+        print("Placas no leídas o no permitidas:")
+        for placa in placas_no_leidas:
+            print(placa)
+
+# Ejemplo de uso
+imagenes_prueba = ["placa1.jpg", "placa2.jpg", "placa3.jpg", "placa4.jpg"]
+lista_placas_permitidas = ["ABC1234", "XYZ5678", "DEF9012"]
+leer_placas(imagenes_prueba, lista_placas_permitidas)</code></pre>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function toggleCode(cardNumber) {
+            const codeContainer = document.getElementById(`code-${cardNumber}`);
+            codeContainer.classList.toggle('active');
+        }
+    </script>
+</body>
+</html>
